@@ -65,7 +65,7 @@ public class ResizableArray<E> {
         int newSize = this.elements.length * this.resizeFactor;
         E[] cache = (E[]) new Object[newSize];
 
-        swapArrays(cache);
+        swapOutElementsArray(cache);
     }
 
     private synchronized void resizeDownIfNeeded() {
@@ -74,14 +74,11 @@ public class ResizableArray<E> {
         int newSize = this.elements.length / this.resizeFactor;
         E[] cache = (E[]) new Object[newSize];
 
-        swapArrays(cache);
+        swapOutElementsArray(cache);
     }
 
-    private void swapArrays(E[] newArray) {
-        for (int i = 0; i < this.size(); i++) {
-            newArray[i] = this.elements[i];
-        }
-
+    private void swapOutElementsArray(E[] newArray) {
+        System.arraycopy(this.elements, 0, newArray, 0, this.size());
         this.elements = newArray;
     }
 
@@ -95,5 +92,4 @@ public class ResizableArray<E> {
         output.append(" ]");
         return output.toString();
     }
-
 }
