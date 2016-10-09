@@ -1,6 +1,6 @@
 package structures;
 
-public class ResizableArray<E> {
+public class ResizableArraySimpleList<E> implements SimpleList<E> {
     private static final int DEFAULT_INITIAL_SIZE = 2;
     private static final int DEFAULT_RESIZE_FACTOR = 2;  // Double array when exceeded
 
@@ -9,29 +9,33 @@ public class ResizableArray<E> {
     private E[] elements;
 
 
-    public ResizableArray() {
+    public ResizableArraySimpleList() {
         this(DEFAULT_INITIAL_SIZE, DEFAULT_RESIZE_FACTOR);
     }
 
-    public ResizableArray(int initialSize, int resizeFactor) {
+    public ResizableArraySimpleList(int initialSize, int resizeFactor) {
         this.elements = (E[]) new Object[initialSize];
         this.resizeFactor = resizeFactor;
         this.lastIndex = -1;
     }
 
+    @Override
     public int size() {
         return this.lastIndex + 1;
     }
 
+    @Override
     public void add(E element) {
         resizeUpIfNeeded();
         this.elements[++lastIndex] = element;
     }
 
+    @Override
     public E get(int index) {
         return (E) this.elements[index];
     }
 
+    @Override
     public void set(int index, E element) {
         if (index > this.lastIndex) {
             throw new ArrayIndexOutOfBoundsException(index);
@@ -40,23 +44,39 @@ public class ResizableArray<E> {
         this.elements[index] = element;
     }
 
+    @Override
     public E remove(E element) {
         E removed = null;
 
         for (int i = 0; i < this.size(); i++) {
-            if (removed != null) {
-                this.elements[i - 1] = this.elements[i];
-            } else if (this.elements[i].equals(element)) {
-                removed = this.elements[i];
+            if (this.elements[i].equals(element)) {
+                removed = remove(i);
+                break;
             }
         }
 
-        if (removed != null) {
-            this.lastIndex--;
-            resizeDownIfNeeded();
+        return removed;
+    }
+
+    @Override
+    public E remove(int index) {
+        if (index > this.lastIndex) {
+            throw new ArrayIndexOutOfBoundsException(index);
         }
 
+        E removed = this.elements[index];
+        shiftElementsLeft(index);
+
+        this.lastIndex--;
+        resizeDownIfNeeded();
+
         return removed;
+    }
+
+    private void shiftElementsLeft(int startFrom) {
+        for (int i = startFrom; i < this.size() - 1; i++) {
+            this.elements[i] = this.elements[i + 1];
+        }
     }
 
     private synchronized void resizeUpIfNeeded() {

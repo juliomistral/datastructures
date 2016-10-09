@@ -1,5 +1,5 @@
 package structures;
 
-public class SimpleHashMap<K, V> {
+public interface SimpleHashMap<K, V> {
 
 }
