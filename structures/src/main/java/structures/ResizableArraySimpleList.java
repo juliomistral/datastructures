@@ -1,6 +1,9 @@
 package structures;
 
-public class ResizableArraySimpleList<E> implements SimpleList<E> {
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class ResizableArraySimpleList<E> implements SimpleList<E>, Iterable<E> {
     private static final int DEFAULT_INITIAL_SIZE = 2;
     private static final int DEFAULT_RESIZE_FACTOR = 2;  // Double array when exceeded
 
@@ -28,6 +31,15 @@ public class ResizableArraySimpleList<E> implements SimpleList<E> {
     public void add(E element) {
         resizeUpIfNeeded();
         this.elements[++lastIndex] = element;
+    }
+
+    private synchronized void resizeUpIfNeeded() {
+        if (elements.length != this.size()) return;
+
+        int newSize = this.elements.length * this.resizeFactor;
+        E[] cache = (E[]) new Object[newSize];
+
+        swapOutElementsArray(cache);
     }
 
     @Override
@@ -79,15 +91,6 @@ public class ResizableArraySimpleList<E> implements SimpleList<E> {
         }
     }
 
-    private synchronized void resizeUpIfNeeded() {
-        if (elements.length != this.size()) return;
-
-        int newSize = this.elements.length * this.resizeFactor;
-        E[] cache = (E[]) new Object[newSize];
-
-        swapOutElementsArray(cache);
-    }
-
     private synchronized void resizeDownIfNeeded() {
         if (elements.length / 2 != this.size()) return;
 
@@ -100,6 +103,26 @@ public class ResizableArraySimpleList<E> implements SimpleList<E> {
     private void swapOutElementsArray(E[] newArray) {
         System.arraycopy(this.elements, 0, newArray, 0, this.size());
         this.elements = newArray;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new Iterator<E>() {
+            int current = 0;
+
+            @Override
+            public boolean hasNext() {
+                return this.current < ResizableArraySimpleList.this.size();
+            }
+
+            @Override
+            public E next() {
+                if (current >= ResizableArraySimpleList.this.size()) {
+                    throw new NoSuchElementException();
+                }
+                return ResizableArraySimpleList.this.elements[current++];
+            }
+        };
     }
 
     @Override

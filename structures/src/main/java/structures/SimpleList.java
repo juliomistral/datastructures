@@ -2,6 +2,7 @@ package structures;
 
 public interface SimpleList<E> {
     int size();
+
     E get(int index);
 
     void add(E element);

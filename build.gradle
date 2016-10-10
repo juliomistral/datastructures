@@ -16,10 +16,10 @@ subprojects { subproject ->
     dependencies {
         testCompile "org.assertj:assertj-core:$assertj_version"
         testCompile 'org.mockito:mockito-all:1.10.19'
-        testCompile 'junit:junit:4.12'
+//        testCompile 'junit:junit:4.12'
 
-//        testCompile "org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version"
-//        testRuntime "org.junit.jupiter:junit-jupiter-engine:$junit_jupiter_version"
+        testCompile "org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version"
+        testRuntime "org.junit.jupiter:junit-jupiter-engine:$junit_jupiter_version"
     }
 }
 
