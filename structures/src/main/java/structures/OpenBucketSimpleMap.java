@@ -5,6 +5,7 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     private ResizableArraySimpleList<Entry>[] buckets;
+    private int valuesSize;
     private float loadFactor;
 
 
@@ -15,6 +16,7 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
     public OpenBucketSimpleMap(int initialCapacity, float loadFactor) {
         this.loadFactor = loadFactor;
         this.buckets = new ResizableArraySimpleList[initialCapacity];
+        this.valuesSize = 0;
     }
 
     @Override
@@ -29,12 +31,14 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
 
         Entry existingEntry = findEntry(key, entries);
         if (existingEntry != null) {
+            V previousValue = existingEntry.value;
             existingEntry.value = value;
-            return existingEntry.value;
+            return previousValue;
         }
 
         Entry newEntry = new Entry(key, value);
         entries.add(newEntry);
+        this.valuesSize++;
 
         rehashIfRequired();
         return null;
@@ -67,6 +71,16 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
 
     @Override
     public V remove(K key) {
+        int index = hashKey(key);
+        ResizableArraySimpleList<Entry> entries = this.buckets[index];
+        if (entries == null) return null;
+
+        Entry removed = findEntry(key, entries);
+        if (removed != null) {
+            entries.remove(removed);
+            return removed.value;
+        }
+
         return null;
     }
 
@@ -82,12 +96,14 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
         }
 
         int hash = key.hashCode();
-        return hash % buckets.length;
+        int hashedIndex = Math.abs(hash % buckets.length);
+
+        return hashedIndex;
     }
 
     @Override
     public int size() {
-        return 0;
+        return this.valuesSize;
     }
 
     private class Entry {
@@ -102,6 +118,21 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
         public boolean hasKey(K other) {
             if (key == null && other == null) return true;
             return this.key.equals(other);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Entry entry = (Entry) o;
+
+            return key.equals(entry.key);
+        }
+
+        @Override
+        public int hashCode() {
+            return key.hashCode();
         }
     }
 }
