@@ -3,7 +3,7 @@ package structures;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class ResizableArraySimpleList<E> implements SimpleList<E>, Iterable<E> {
+public class ResizableArraySimpleList<E> implements SimpleList<E> {
     private static final int DEFAULT_INITIAL_SIZE = 2;
     private static final int DEFAULT_RESIZE_FACTOR = 2;  // Double array when exceeded
 

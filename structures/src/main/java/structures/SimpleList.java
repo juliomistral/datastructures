@@ -1,6 +1,6 @@
 package structures;
 
-public interface SimpleList<E> {
+public interface SimpleList<E> extends Iterable<E>{
     int size();
 
     E get(int index);

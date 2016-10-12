@@ -3,10 +3,15 @@ package structures;
 public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
     private static final int DEFAULT_CAPACITY = 20;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final int DEFAULT_RESIZE_FACTOR = 2;
 
-    private ResizableArraySimpleList<Entry>[] buckets;
+    // Create an array size equal to max int minus a buffer
+    private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 1024;
+
+    private SimpleList<Entry>[] table;
     private int valuesSize;
     private float loadFactor;
+    private int threshold;
 
 
     public OpenBucketSimpleMap() {
@@ -15,18 +20,25 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
 
     public OpenBucketSimpleMap(int initialCapacity, float loadFactor) {
         this.loadFactor = loadFactor;
-        this.buckets = new ResizableArraySimpleList[initialCapacity];
         this.valuesSize = 0;
+
+        this.table = new ResizableArraySimpleList[initialCapacity];
+        calculateThreshold();
+    }
+
+    private void calculateThreshold() {
+        float loadProduct = this.table.length * loadFactor;
+        this.threshold = (int) Math.min(loadProduct, MAX_ARRAY_SIZE);
     }
 
     @Override
     public V put(K key, V value) {
         int index = hashKey(key);
-        ResizableArraySimpleList<Entry> entries = this.buckets[index];
+        SimpleList<Entry> entries = this.table[index];
 
         if (entries == null) {
             entries = new ResizableArraySimpleList<>();
-            this.buckets[index] = entries;
+            this.table[index] = entries;
         }
 
         Entry existingEntry = findEntry(key, entries);
@@ -38,16 +50,17 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
 
         Entry newEntry = new Entry(key, value);
         entries.add(newEntry);
-        this.valuesSize++;
 
+        this.valuesSize++;
         rehashIfRequired();
+
         return null;
     }
 
     @Override
     public V get(K key) {
         int index = hashKey(key);
-        ResizableArraySimpleList<Entry> entries = this.buckets[index];
+        SimpleList<Entry> entries = this.table[index];
         if (entries == null) return null;
 
         Entry existingEntry = findEntry(key, entries);
@@ -58,7 +71,7 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
         return null;
     }
 
-    private Entry findEntry(K key, ResizableArraySimpleList<Entry> entries) {
+    private Entry findEntry(K key, SimpleList<Entry> entries) {
         for (Entry current : entries) {
             if (current.hasKey(key)) return current;
         }
@@ -66,18 +79,41 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
     }
 
     private void rehashIfRequired() {
+        if (this.valuesSize < threshold) {
+            return;
+        }
+
+        // Calculating new table size without overflowing int into a negative number
+        double resizeProduct = (double)this.table.length * DEFAULT_RESIZE_FACTOR;
+        int newTableSize = (int) Math.min(resizeProduct, MAX_ARRAY_SIZE);
+        int oldTableSize = this.table.length;
+
+        // Can't resize array any longer, at max array size.  no op
+        if (newTableSize == oldTableSize) {
+            return;
+        }
+
+        SimpleList<Entry>[] newTable = new ResizableArraySimpleList[newTableSize];
+        System.arraycopy(this.table, 0, newTable, 0, oldTableSize);
+        this.table = newTable;
+
+        calculateThreshold();
 
     }
 
     @Override
     public V remove(K key) {
         int index = hashKey(key);
-        ResizableArraySimpleList<Entry> entries = this.buckets[index];
+        SimpleList<Entry> entries = this.table[index];
         if (entries == null) return null;
 
         Entry removed = findEntry(key, entries);
         if (removed != null) {
             entries.remove(removed);
+            this.valuesSize--;
+
+            rehashIfRequired();
+
             return removed.value;
         }
 
@@ -96,7 +132,7 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
         }
 
         int hash = key.hashCode();
-        int hashedIndex = Math.abs(hash % buckets.length);
+        int hashedIndex = Math.abs(hash % table.length);
 
         return hashedIndex;
     }
