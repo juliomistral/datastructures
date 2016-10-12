@@ -33,12 +33,24 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
 
     @Override
     public V put(K key, V value) {
-        int index = hashKey(key);
-        SimpleList<Entry> entries = this.table[index];
+        V previousValue = createOrUpdateEntry(key, value, this.table);
+        if (previousValue != null) {
+            return previousValue;
+        }
+
+        this.valuesSize++;
+        rehashIfRequired();
+
+        return null;
+    }
+
+    private V createOrUpdateEntry(K key, V value, SimpleList<Entry>[] hashTable) {
+        int index = hashKey(key, hashTable.length);
+        SimpleList<Entry> entries = hashTable[index];
 
         if (entries == null) {
             entries = new ResizableArraySimpleList<>();
-            this.table[index] = entries;
+            hashTable[index] = entries;
         }
 
         Entry existingEntry = findEntry(key, entries);
@@ -51,15 +63,12 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
         Entry newEntry = new Entry(key, value);
         entries.add(newEntry);
 
-        this.valuesSize++;
-        rehashIfRequired();
-
         return null;
     }
 
     @Override
     public V get(K key) {
-        int index = hashKey(key);
+        int index = hashKey(key, this.table.length);
         SimpleList<Entry> entries = this.table[index];
         if (entries == null) return null;
 
@@ -94,16 +103,22 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
         }
 
         SimpleList<Entry>[] newTable = new ResizableArraySimpleList[newTableSize];
-        System.arraycopy(this.table, 0, newTable, 0, oldTableSize);
+        for (int i = 0; i < this.table.length; i++) {
+            SimpleList<Entry> entries = this.table[i];
+            if (entries == null) continue;
+
+            for (Entry current : entries) {
+                createOrUpdateEntry(current.key, current.value, newTable);
+            }
+        }
+
         this.table = newTable;
-
         calculateThreshold();
-
     }
 
     @Override
     public V remove(K key) {
-        int index = hashKey(key);
+        int index = hashKey(key, this.table.length);
         SimpleList<Entry> entries = this.table[index];
         if (entries == null) return null;
 
@@ -125,14 +140,14 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
         return false;
     }
 
-    private int hashKey(K key) {
+    private int hashKey(K key, int hashTableSize) {
         // NULL keys always resolve to the first bucket "0"
         if (key == null) {
             return 0;
         }
 
         int hash = key.hashCode();
-        int hashedIndex = Math.abs(hash % table.length);
+        int hashedIndex = Math.abs(hash % hashTableSize);
 
         return hashedIndex;
     }

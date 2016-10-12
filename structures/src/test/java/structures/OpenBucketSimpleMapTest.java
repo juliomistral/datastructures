@@ -113,4 +113,31 @@ public class OpenBucketSimpleMapTest {
             assertThat(removed).as("Removed value").isEqualTo("value");
         }
     }
+
+    @Nested
+    public class WhenRehasingOccurs {
+        @Test
+        public void allValuesAreStillAvailableAfterTheRehashing() {
+            // This will force a rehash after the first 2 puts
+            tested = new OpenBucketSimpleMap<>(2, 0.5f);
+            tested.put("key", "value");
+            tested.put("foo", "bar");
+            tested.put("otherKey", "otherValue");
+
+            assertThat(tested.get("key")).as("Mapped value").isEqualTo("value");
+            assertThat(tested.get("foo")).as("Mapped value").isEqualTo("bar");
+            assertThat(tested.get("otherKey")).as("Mapped value").isEqualTo("otherValue");
+        }
+
+        @Test
+        public void mapSizeDoesNotChangeAfterTheRehashing() {
+            // This will force a rehash after the first 2 puts
+            tested = new OpenBucketSimpleMap<>(2, 0.5f);
+            tested.put("key", "value");
+            tested.put("foo", "bar");
+            tested.put("otherKey", "otherValue");
+
+            assertThat(tested.size()).as("Map size").isEqualTo(3);
+        }
+    }
 }
