@@ -4,6 +4,15 @@ import java.util.*;
 import java.awt.*;
 
 public class AssortedMethods {
+	public static boolean isSorted(int[] array) {
+		for (int i = 1; i < array.length; i++) {
+			if (array[i-1] > array[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public static int randomInt(int n) {
 		return (int) (Math.random() * n);
 	}

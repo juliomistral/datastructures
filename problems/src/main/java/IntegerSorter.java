@@ -1,4 +1,3 @@
-package PACKAGE_NAME;
-
-public interface Sorter {
+public interface IntegerSorter {
+    void sort(int[] array);
 }
