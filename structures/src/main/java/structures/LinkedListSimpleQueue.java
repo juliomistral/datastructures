@@ -1,21 +1,24 @@
 package structures;
 
 
+import structures.basic.DoubleLinkedNode;
+
 import java.util.NoSuchElementException;
 
 public class LinkedListSimpleQueue<E> implements SimpleQueue<E> {
-    private Node head, tail;
+    private DoubleLinkedNode<E> head, tail;
 
 
     @Override
     public void enqueue(E element) {
-        Node newNode = new Node(element);
-        if (head == null) {
-            head = newNode;
+        DoubleLinkedNode newNode;
+
+        if (empty()) {
+            head = tail = new DoubleLinkedNode(element);
+            return;
         }
 
-        tail = newNode;
-
+        tail = tail.addNext(element);
     }
 
     @Override
@@ -23,7 +26,15 @@ public class LinkedListSimpleQueue<E> implements SimpleQueue<E> {
         if (empty()) {
             throw new NoSuchElementException();
         }
-        return null;
+
+        E dequeued = head.data();
+        head = head.next();
+
+        if(empty()) { // If we're empty, clear tail
+            tail = null;
+        }
+
+        return dequeued;
     }
 
     @Override

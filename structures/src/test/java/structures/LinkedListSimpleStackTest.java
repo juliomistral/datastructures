@@ -26,6 +26,14 @@ public class LinkedListSimpleStackTest {
                 stack.pop();
             }).isInstanceOf(NoSuchElementException.class);
         }
+
+        @Test
+        public void peekingThrowsANoSuchElementException() {
+            stack = new LinkedListSimpleStack<>();
+            assertThatThrownBy(() -> {
+                stack.peek();
+            }).isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @Nested

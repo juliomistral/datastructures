@@ -40,4 +40,33 @@ public class LinkedListSimpleQueueTest {
             assertThat(queue.empty()).isFalse();
         }
     }
+
+    @Nested
+    public class WhenDequeuingElements {
+        @Test
+        public void canDequeueElementsInTheOrderTheyWereEnqueued() {
+            queue = new LinkedListSimpleQueue<>();
+            queue.enqueue(10);
+            queue.enqueue(20);
+            queue.enqueue(30);
+
+            assertThat(queue.dequeue()).isEqualTo(10);
+            assertThat(queue.dequeue()).isEqualTo(20);
+            assertThat(queue.dequeue()).isEqualTo(30);
+        }
+
+        @Test
+        public void queueIsEmptyIfAllElementsAreDequeued() {
+            queue = new LinkedListSimpleQueue<>();
+            queue.enqueue(10);
+            queue.enqueue(20);
+            queue.enqueue(30);
+
+            queue.dequeue();
+            queue.dequeue();
+            queue.dequeue();
+
+            assertThat(queue.empty()).isTrue();
+        }
+    }
 }

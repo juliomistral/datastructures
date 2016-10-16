@@ -1,10 +1,12 @@
 package structures;
 
 
+import structures.basic.DoubleLinkedNode;
+
 import java.util.NoSuchElementException;
 
 public class LinkedListSimpleStack<E> implements SimpleStack<E> {
-    private Node<E> top;
+    private DoubleLinkedNode<E> top;
 
 
     @Override
@@ -13,21 +15,30 @@ public class LinkedListSimpleStack<E> implements SimpleStack<E> {
             throw new NoSuchElementException();
         }
 
-        E popped = top.data;
-        top = top.next;
+        E popped = top.data();
+        top = top.next();
 
         return popped;
     }
 
     @Override
     public E peek() {
-        return top.data;
+        if (empty()) {
+            throw new NoSuchElementException();
+        }
+
+        return top.data();
     }
 
     @Override
     public void push(E element) {
-        Node newNode = new Node(element);
-        newNode.next = top;
+        DoubleLinkedNode newNode;
+
+        if (top == null) {
+            newNode = new DoubleLinkedNode(element);
+        } else {
+            newNode = top.addPrevious(element);
+        }
         top = newNode;
     }
 
