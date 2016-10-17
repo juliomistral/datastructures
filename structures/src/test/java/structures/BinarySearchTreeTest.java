@@ -97,18 +97,29 @@ public class BinarySearchTreeTest {
             assertThat(results).containsExactly(0, 5, 8, 10, 12, 15, 18);
         }
 
-//        @Test
-//        @Ignore
-//        public void traversingPreOrderVisitsNodesByCurrentNodeFirst() {
-//            bst = complexTree();
-//            ArrayList results = new ArrayList();
-//
-//            bst.traverse(BinarySearchTree.TraversalStrategy.PRE_ORDER, node -> {
-//                results.add(node.getData());
-//            });
-//
-//            assertThat(results).containsExactly(0, 5, 8, 10, 12, 15, 18);
-//        }
+        @Test
+        public void traversingPreOrderVisitsNodesByCurrentNodeFirst() {
+            bst = complexTree();
+            ArrayList results = new ArrayList();
+
+            bst.traverse(BinarySearchTree.TraversalStrategy.PRE_ORDER, node -> {
+                results.add(node.getData());
+            });
+
+            assertThat(results).containsExactly(10, 5, 0, 8, 15, 12, 18);
+        }
+
+        @Test
+        public void traversingPostOrderVisitsNodesByCurrentNodeLast() {
+            bst = complexTree();
+            ArrayList results = new ArrayList();
+
+            bst.traverse(BinarySearchTree.TraversalStrategy.POST_ORDER, node -> {
+                results.add(node.getData());
+            });
+
+            assertThat(results).containsExactly(0, 8, 5, 12, 18, 15, 10);
+        }
     }
 
     /**

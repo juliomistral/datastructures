@@ -113,10 +113,12 @@ public class BinarySearchTree<D extends Comparable<D>> {
                 visitCallback.accept(current);
                 traverseInternal(current.getLeft(), strategy, visitCallback);
                 traverseInternal(current.getRight(), strategy, visitCallback);
+                break;
             case POST_ORDER:
                 traverseInternal(current.getLeft(), strategy, visitCallback);
                 traverseInternal(current.getRight(), strategy, visitCallback);
                 visitCallback.accept(current);
+                break;
         }
     }
 
