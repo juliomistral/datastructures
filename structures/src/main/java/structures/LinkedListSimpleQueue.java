@@ -46,4 +46,19 @@ public class LinkedListSimpleQueue<E> implements SimpleQueue<E> {
     public boolean empty() {
         return head == null;
     }
+
+    @Override
+    public String toString() {
+        if (empty()) return "";
+
+        StringBuilder output = new StringBuilder(head.toString());
+        DoubleLinkedNode current = head;
+
+        do {
+            output.append(" --> ").append(current.data());
+            current = current.next();
+        } while (current.next() != null);
+
+        return output.toString();
+    }
 }

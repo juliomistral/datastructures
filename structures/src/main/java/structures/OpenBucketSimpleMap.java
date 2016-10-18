@@ -1,5 +1,7 @@
 package structures;
 
+import java.util.Iterator;
+
 public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
     private static final int DEFAULT_CAPACITY = 20;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
@@ -186,4 +188,28 @@ public class OpenBucketSimpleMap<K, V> implements SimpleMap<K, V> {
             return key.hashCode();
         }
     }
+
+//    private class ValuesIterator implements Iterator<V> {
+//        private int currentBucket;
+//        private int currentEntry;
+//        private V nextValue;
+//
+//
+//        public ValuesIterator() {
+//            currentBucket = 0;
+//            currentEntry = 0;
+//
+//            while ()
+//        }
+//
+//        @Override
+//        public boolean hasNext() {
+//            return nextEntry != null;
+//        }
+//
+//        @Override
+//        public V next() {
+//            return null;
+//        }
+//    }
 }
