@@ -42,6 +42,14 @@ public class BTreeNode<D extends Comparable<D>> {
         return orig;
     }
 
+    public void removeChild(BTreeNode<D> child) {
+        if (this.getLeft() == child) {
+            this.setLeft(null);
+        } else if (this.getRight() == child) {
+            this.setRight(null);
+        }
+    }
+
     public BTreeNode<D> getParent() {
         return parent;
     }
@@ -58,8 +66,16 @@ public class BTreeNode<D extends Comparable<D>> {
         return data;
     }
 
+    public BTreeNode<D> findMinNode() {
+        if (this.leftExists()) {
+            return this.getLeft().findMinNode();
+        } else {
+            return this;
+        }
+    }
+
     public boolean isLeaf() {
-        return (this.right != null && this.left != null);
+        return (this.right == null && this.left == null);
     }
 
     public boolean isLessThanOrEqual(D data) {

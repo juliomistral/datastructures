@@ -85,7 +85,38 @@ public class BinarySearchTree<D extends Comparable<D>> {
      * @return
      */
     public BTreeNode<D> remove(D data) {
-        return null;
+        if (empty()) {
+            return null;
+        }
+
+        BTreeNode<D> toBeRemoved = findInternal(this.root, data);
+        removeInternal(toBeRemoved);
+
+        return toBeRemoved;
+    }
+
+    private void removeInternal(BTreeNode<D> current) {
+        // 3 cases to check when removing a node:
+        //   1. No children: cut the node loose
+        //   2. 2 children: replace current node value with min value from right sub-tree, cut child loose
+        //   3. One child: replace current node value with it's child value, cut child loose
+        if (current.isLeaf()) {  // children = 0
+            if (current == root) {
+                this.root = null;
+                return;
+            }
+            current.getParent().removeChild(current);
+        } else if (current.leftExists() && current.rightExists()) { // children = 2
+            BTreeNode<D> child = current.getRight().findMinNode();
+
+            current.setData(child.getData());
+            child.getParent().removeChild(child);
+        } else { // children = 1
+            BTreeNode<D> child = current.leftExists() ? current.getLeft() : current.getRight();
+
+            current.setData(child.getData());
+            child.getParent().removeChild(child);
+        }
     }
 
     /**

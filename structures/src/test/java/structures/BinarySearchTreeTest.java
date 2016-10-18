@@ -34,6 +34,48 @@ public class BinarySearchTreeTest {
     }
 
     @Nested
+    public class WhenDeletingElements {
+        @Test
+        public void removingOnlyElementInTreeWillLeaveTreeEmpty() {
+            bst = new BinarySearchTree<>();
+            bst.insert(10);
+
+            bst.remove(10);
+
+            assertThat(bst.empty()).isTrue();
+        }
+
+        @Test
+        public void removingElementWillRearrangeTreeCorrectlyIfRemovedElementHasTwoChildren() {
+            bst = complexTree();
+            ArrayList<Integer> result = new ArrayList<>();
+
+            bst.remove(10);
+
+            bst.traverse(BinarySearchTree.TraversalStrategy.IN_ORDER, node -> {
+                result.add(node.getData());
+            });
+
+            assertThat(result).containsExactly(0, 5, 8, 12, 15, 18);
+        }
+
+        @Test
+        public void removingElementWillRearrangeTreeCorrectlyIfRemovedElementHasOneChildren() {
+            bst = complexTree();
+            bst.remove(18);
+            ArrayList<Integer> result = new ArrayList<>();
+
+            bst.remove(15);
+
+            bst.traverse(BinarySearchTree.TraversalStrategy.IN_ORDER, node -> {
+                result.add(node.getData());
+            });
+
+            assertThat(result).containsExactly(0, 5, 8, 10, 12);
+        }
+    }
+
+    @Nested
     public class WhenFindingElements {
         @Test
         public void anEmptyBSTReturnsNull() {
@@ -76,7 +118,7 @@ public class BinarySearchTreeTest {
         }
 
         @Test
-        public void returnsNullIfProbidedDataCantBeFound() {
+        public void returnsNullIfProvidedDataCantBeFound() {
             bst = complexTree();
 
             assertThat(bst.find(10000)).isNull();
