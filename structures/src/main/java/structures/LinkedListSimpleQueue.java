@@ -39,7 +39,7 @@ public class LinkedListSimpleQueue<E> implements SimpleQueue<E> {
 
     @Override
     public E peek() {
-        return null;
+        return head.data();
     }
 
     @Override
